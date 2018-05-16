@@ -19,5 +19,6 @@
 
 install(FILES
     limesdr_source.xml
+    limesdr_source_short.xml
     limesdr_sink.xml DESTINATION share/gnuradio/grc/blocks
 )

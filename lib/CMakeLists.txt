@@ -30,6 +30,7 @@ link_directories(${Boost_LIBRARY_DIRS}
 
 list(APPEND limesdr_sources
     source_impl.cc
+    source_short_impl.cc
     sink_impl.cc
     common/device_handler.cc
 )

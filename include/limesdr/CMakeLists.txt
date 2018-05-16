@@ -23,5 +23,6 @@
 install(FILES
     api.h
     source.h
+    source_short.h
     sink.h DESTINATION include/limesdr
 )
