@@ -21,8 +21,11 @@
 #ifndef INCLUDED_LIMESDR_SOURCE_IMPL_H
 #define INCLUDED_LIMESDR_SOURCE_IMPL_H
 
+#include <pmt/pmt.h>
 #include <limesdr/source.h>
 #include "common/device_handler.h"
+
+static const pmt::pmt_t TIME_KEY = pmt::string_to_symbol("rx_time");
 
 namespace gr
 {
@@ -33,8 +36,8 @@ namespace gr
     private:
 	lms_stream_t streamId[2];
 	uint32_t fifosize =  4096*10;
-
-
+	uint64_t d_last_timestamp = 0;
+	pmt::pmt_t _id;
 
 	int LMS_CH_0 = 0;
 	int LMS_CH_1 = 1;

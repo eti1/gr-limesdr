@@ -116,6 +116,11 @@ namespace gr
 			gr::io_signature::make(0, 0, 0), // Based on chip_mode SISO/MIMO use appropriate output signature
 			args_to_io_signature(chip_mode))
     {
+     /* init stream id as in usrp*/
+      std::stringstream str;
+      str << name() << unique_id();
+      _id = pmt::string_to_symbol(str.str());
+    
 	std::cout << "---------------------------------------------------------------" <<  std::endl;
 	std::cout << "LimeSuite Source (RX) info" << std::endl;
 	std::cout << std::endl;
@@ -260,13 +265,33 @@ namespace gr
 	// Receive stream for channel 0 (if chip_mode is SISO)
 	if(stored.chip_mode == 1)
 	{
+        lms_stream_meta_t meta;
 	    int ret = LMS_RecvStream(&streamId[stored.channel],
 				    output_items[0],
 				    noutput_items,
-				    NULL, 0);
+				    &meta, 0);
 
 	    if (ret < 0)
 		return 0; //call again
+
+#if 0
+		/* DEBUG */
+		lms_stream_status_t status;
+		LMS_GetStreamStatus(&streamId[stored.channel], &status);
+		if (status.overrun||status.underrun||status.droppedPackets)
+		{
+			printf("RX problem: ovr=%d, undr=%d, drop=%d\n",
+				status.overrun,status.underrun,status.droppedPackets);
+		}
+#endif
+		/* Arbitrary defined time interval for stream tagging */
+        if(d_last_timestamp - meta.timestamp > 0x1000)
+		{
+			d_last_timestamp = meta.timestamp;
+            this->add_item_tag(0, nitems_written(0), TIME_KEY,
+                               pmt::from_uint64(d_last_timestamp), _id);
+		}
+		
 
 	    produce(0,ret);
 	    return WORK_CALLED_PRODUCE;
