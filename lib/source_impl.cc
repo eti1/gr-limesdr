@@ -293,8 +293,10 @@ namespace gr
 		if(d_meta_freq && meta.timestamp && meta.timestamp - d_last_timestamp > d_meta_freq)
 		{
 			d_last_timestamp = meta.timestamp;
+#if 0
 			printf("Limesdr: tag sample n=%16lld, with %16lld\n",
 				nitems_written(0), d_last_timestamp);
+#endif
             this->add_item_tag(0, nitems_written(0), TIME_KEY,
                                pmt::from_uint64(d_last_timestamp), _id);
 		}
