@@ -117,7 +117,8 @@ namespace gr
 			int digital_filter_ch1,
 			double digital_bandw_ch1,
 			int gain_dB_ch0,
-			int gain_dB_ch1);
+			int gain_dB_ch1,
+			unsigned meta_freq);
     };
   }
 }

@@ -29,7 +29,8 @@
 			 $digital_filter_ch1,
 			 $digital_bandw_ch1,
 			 $gain_dB_ch0,
-			 $gain_dB_ch1)</make>
+			 $gain_dB_ch1,
+			 $meta_freq)</make>
 		
     <param>
         <name>Device number</name>
@@ -69,6 +70,14 @@
             <name>MIMO</name>
             <key>2</key>
         </option>
+    </param>
+
+    <param>
+        <name>Meta/sample freq (0=No meta)</name>
+        <key>meta_freq</key>
+        <value>0</value>
+        <type>int</type>
+        <hide>none</hide>
     </param>
 
     <param>

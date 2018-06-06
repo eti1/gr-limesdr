@@ -55,7 +55,8 @@ namespace gr
 		int digital_filter_ch1,
 		double digital_bandw_ch1,
 		int gain_dB_ch0,
-		int gain_dB_ch1)
+		int gain_dB_ch1,
+		unsigned meta_freq)
     {
 	return gnuradio::get_initial_sptr
 	      (new source_impl(device_number,
@@ -83,7 +84,8 @@ namespace gr
 			      digital_filter_ch1,
 			      digital_bandw_ch1,
 			      gain_dB_ch0,
-			      gain_dB_ch1));
+			      gain_dB_ch1,
+				  meta_freq));
     }
 
     source_impl::source_impl(int device_number,
@@ -111,10 +113,13 @@ namespace gr
 			    int digital_filter_ch1,
 			    double digital_bandw_ch1,
 			    int gain_dB_ch0,
-			    int gain_dB_ch1)
+			    int gain_dB_ch1,
+				unsigned meta_freq)
 	: gr::sync_block("source",
 			gr::io_signature::make(0, 0, 0), // Based on chip_mode SISO/MIMO use appropriate output signature
-			args_to_io_signature(chip_mode))
+			args_to_io_signature(chip_mode)),
+	d_last_timestamp(0),
+	d_meta_freq(meta_freq)
     {
      /* init stream id as in usrp*/
       std::stringstream str;
@@ -265,11 +270,11 @@ namespace gr
 	// Receive stream for channel 0 (if chip_mode is SISO)
 	if(stored.chip_mode == 1)
 	{
-        lms_stream_meta_t meta;
+        lms_stream_meta_t meta = {0};
 	    int ret = LMS_RecvStream(&streamId[stored.channel],
 				    output_items[0],
 				    noutput_items,
-				    &meta, 0);
+				    d_meta_freq ? &meta : NULL, 0);
 
 	    if (ret < 0)
 		return 0; //call again
@@ -285,13 +290,14 @@ namespace gr
 		}
 #endif
 		/* Arbitrary defined time interval for stream tagging */
-        if(d_last_timestamp - meta.timestamp > 0x1000)
+		if(d_meta_freq && meta.timestamp && meta.timestamp - d_last_timestamp > d_meta_freq)
 		{
 			d_last_timestamp = meta.timestamp;
+			printf("Limesdr: tag sample n=%16lld, with %16lld\n",
+				nitems_written(0), d_last_timestamp);
             this->add_item_tag(0, nitems_written(0), TIME_KEY,
                                pmt::from_uint64(d_last_timestamp), _id);
 		}
-		
 
 	    produce(0,ret);
 	    return WORK_CALLED_PRODUCE;

@@ -36,7 +36,8 @@ namespace gr
     private:
 	lms_stream_t streamId[2];
 	uint32_t fifosize =  4096*10;
-	uint64_t d_last_timestamp = 0;
+	uint64_t d_last_timestamp;
+	uint64_t d_meta_freq;
 	pmt::pmt_t _id;
 
 	int LMS_CH_0 = 0;
@@ -77,7 +78,8 @@ namespace gr
 		    int digital_filter_ch1,
 		    double digital_bandw_ch1,
 		    int gain_dB_ch0,
-		    int gain_dB_ch1);
+		    int gain_dB_ch1,
+			unsigned meta_freq);
 	~source_impl();
 
 	int work(int noutput_items,
